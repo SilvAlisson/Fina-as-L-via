@@ -34,8 +34,13 @@ export function InstallmentGroupCard({
 
   const unpaidCount = unpaidInstallments.length;
 
-  // Validar se o logo é uma URL válida
-  const isValidLogo = group.cartaoLogo && group.cartaoLogo.trim().length > 0;
+  // Validar se o logo é uma URL válida (deve começar com / ou http:// ou https://)
+  const isValidLogo =
+    group.cartaoLogo &&
+    group.cartaoLogo.trim().length > 0 &&
+    (group.cartaoLogo.startsWith('/') ||
+     group.cartaoLogo.startsWith('http://') ||
+     group.cartaoLogo.startsWith('https://'));
 
   const isFullySelected =
     selectedInstallments.size === unpaidInstallments.length &&
