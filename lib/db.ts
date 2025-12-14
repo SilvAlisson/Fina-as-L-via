@@ -13,7 +13,7 @@ let _pool: Pool | undefined;
 function getDb() {
   if (_db) return _db;
 
-  // 1. Lê a variável de ambiente (Segurança ✅)
+  // 1. Lê a variável de ambiente
   let connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
@@ -21,17 +21,24 @@ function getDb() {
   }
 
   // 2. LIMPEZA CRÍTICA: Remove parâmetros da URL (como ?sslmode=require)
-  // Isso impede que o driver force validação estrita de SSL
+  // Isso garante que a configuração de SSL seja controlada apenas pelo objeto 'poolConfig' abaixo
   if (connectionString.includes("?")) {
     connectionString = connectionString.split("?")[0];
   }
 
-  // 3. Configuração que aceita o certificado do Supabase
+  // 3. Configuração Inteligente de SSL
+  // Se houver um certificado CA configurado (Produção/Vercel), usa validação estrita.
+  // Caso contrário, aceita certificados autoassinados (evita erros em dev/fallback).
   const poolConfig: PoolConfig = {
-    connectionString: connectionString, 
-    ssl: {
-      rejectUnauthorized: false, // Aceita o certificado "auto-assinado" do Supabase
-    },
+    connectionString: connectionString,
+    ssl: process.env.SUPABASE_CA
+      ? {
+          rejectUnauthorized: true,
+          ca: process.env.SUPABASE_CA,
+        }
+      : {
+          rejectUnauthorized: false,
+        },
     max: 10,
     connectionTimeoutMillis: 10000,
   };
