@@ -59,7 +59,7 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
-    camelCase: true,
+    /*camelCase: true, */
   }),
 
   // Google OAuth (se configurado)
