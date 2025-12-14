@@ -13,22 +13,24 @@ let _pool: Pool | undefined;
 function getDb() {
   if (_db) return _db;
 
-  // 1. Pega a URL do ambiente ou usa o fallback
-  let connectionString = 
-    process.env.DATABASE_URL || 
-    "postgresql://postgres.uoagfjzsqwyobuduzkco:Livia-Financas2025@aws-1-us-east-2.pooler.supabase.com:6543/postgres";
+  // 1. Lê a variável de ambiente (Segurança ✅)
+  let connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error("DATABASE_URL env variable is not set");
+  }
 
   // 2. LIMPEZA CRÍTICA: Remove parâmetros da URL (como ?sslmode=require)
-  // Isso garante que o driver obedeça nossa configuração manual de SSL abaixo
+  // Isso impede que o driver force validação estrita de SSL
   if (connectionString.includes("?")) {
     connectionString = connectionString.split("?")[0];
   }
 
-  // 3. Configuração explícita
+  // 3. Configuração que aceita o certificado do Supabase
   const poolConfig: PoolConfig = {
-    connectionString,
+    connectionString: connectionString, 
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: false, // Aceita o certificado "auto-assinado" do Supabase
     },
     max: 10,
     connectionTimeoutMillis: 10000,
