@@ -60,10 +60,12 @@ export function AnticipationHistoryDialog({
     try {
       const result = await getInstallmentAnticipationsAction(seriesId);
 
-      if (result.success && result.data) {
-        setAnticipations(result.data);
+      if (result.success) {
+        // Se sucesso, garantimos um array (mesmo que venha undefined/null)
+        setAnticipations(result.data || []);
       } else {
-        toast.error(result.error || "Erro ao carregar histórico de antecipações");
+        // Agora o TS sabe que aqui é o caso de erro (ou forçamos o acesso)
+        toast.error((result as any).error || "Erro ao carregar histórico de antecipações");
         setAnticipations([]);
       }
     } catch (error) {

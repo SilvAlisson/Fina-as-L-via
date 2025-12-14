@@ -43,8 +43,9 @@ const updateEmailSchema = z
   });
 
 const deleteAccountSchema = z.object({
-  confirmation: z.literal("DELETAR", {
-    errorMap: () => ({ message: 'Você deve digitar "DELETAR" para confirmar' }),
+  confirmation: z.enum(["DELETAR"], {
+    // CORREÇÃO: Usar 'message' ao invés de 'errorMap'
+    message: 'Você deve digitar "DELETAR" para confirmar',
   }),
 });
 

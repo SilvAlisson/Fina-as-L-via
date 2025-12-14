@@ -384,12 +384,13 @@ async function aggregateMonthData(userId: string, period: string) {
 
   // Análise de gastos parcelados
   const installmentTransactions = last3MonthsTransactions.filter(
-    tx => tx.condition === "Parcelado" && tx.installmentCount && tx.installmentCount > 1
-  );
+  (tx: typeof last3MonthsTransactions[number]) => 
+    tx.condition === "Parcelado" && tx.installmentCount && tx.installmentCount > 1
+);
 
   const installmentData = installmentTransactions
-    .filter(tx => tx.period === period)
-    .map(tx => ({
+    .filter((tx: typeof last3MonthsTransactions[number]) => tx.period === period)
+  .map((tx: typeof last3MonthsTransactions[number]) => ({
       name: tx.name,
       currentInstallment: tx.currentInstallment ?? 1,
       totalInstallments: tx.installmentCount ?? 1,
@@ -397,11 +398,11 @@ async function aggregateMonthData(userId: string, period: string) {
       category: tx.categoryName ?? "Outros",
     }));
 
-  const totalInstallmentAmount = installmentData.reduce((sum, tx) => sum + tx.amount, 0);
-  const futureCommitment = installmentData.reduce((sum, tx) => {
-    const remaining = (tx.totalInstallments - tx.currentInstallment);
-    return sum + (tx.amount * remaining);
-  }, 0);
+  const totalInstallmentAmount = installmentData.reduce((sum: number, tx) => sum + tx.amount, 0);
+const futureCommitment = installmentData.reduce((sum: number, tx) => {
+  const remaining = (tx.totalInstallments - tx.currentInstallment);
+  return sum + (tx.amount * remaining);
+}, 0);
 
   // Montar dados agregados e anonimizados
   const aggregatedData = {
@@ -506,9 +507,9 @@ async function aggregateMonthData(userId: string, period: string) {
       percentageOfExpenses: currentExpense > 0 ? (totalInstallmentAmount / currentExpense) * 100 : 0,
       futureCommitment,
       topInstallments: installmentData
-        .sort((a, b) => b.amount - a.amount)
-        .slice(0, 5)
-        .map(i => ({
+        .sort((a: any, b: any) => b.amount - a.amount)
+.slice(0, 5)
+.map((i: any) => ({
           name: i.name,
           current: i.currentInstallment,
           total: i.totalInstallments,

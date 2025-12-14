@@ -53,9 +53,12 @@ export function PagadorSharingCard({
         return;
       }
 
-      setCurrentCode(result.code);
-      toast.success("Novo código gerado com sucesso.");
-      router.refresh();
+      // CORREÇÃO: Verificamos se a propriedade 'code' existe
+      if ("code" in result) {
+        setCurrentCode(result.code);
+        toast.success("Novo código gerado com sucesso.");
+        router.refresh();
+      }
     });
   };
 

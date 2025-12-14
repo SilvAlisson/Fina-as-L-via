@@ -100,6 +100,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   const accountOptions = filterSources.contaRows.map((conta: Conta) => ({
     id: conta.id,
     name: conta.name ?? "Conta",
+    logo: conta.logo,
   }));
 
   const contaName =
@@ -186,6 +187,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           pagadorFilterOptions={pagadorFilterOptions}
           categoriaFilterOptions={categoriaFilterOptions}
           contaCartaoFilterOptions={contaCartaoFilterOptions}
+          estabelecimentos={[]} // <--- ADICIONE ESTA LINHA
           selectedPeriod={selectedPeriod}
           allowCreate
           defaultCartaoId={card.id}
