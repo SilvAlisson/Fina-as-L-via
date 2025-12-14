@@ -13,30 +13,31 @@ let _pool: Pool | undefined;
 function getDb() {
   if (_db) return _db;
 
-  const { DATABASE_URL, NODE_ENV } = process.env;
+  // 1. Pega a URL do ambiente ou usa o fallback
+  let connectionString = 
+    process.env.DATABASE_URL || 
+    "postgresql://postgres.uoagfjzsqwyobuduzkco:Livia-Financas2025@aws-1-us-east-2.pooler.supabase.com:6543/postgres";
 
-  if (!DATABASE_URL) {
-    throw new Error("DATABASE_URL env variable is not set");
+  // 2. LIMPEZA CRÍTICA: Remove parâmetros da URL (como ?sslmode=require)
+  // Isso garante que o driver obedeça nossa configuração manual de SSL abaixo
+  if (connectionString.includes("?")) {
+    connectionString = connectionString.split("?")[0];
   }
 
-  // Configuração robusta para Vercel + Supabase
+  // 3. Configuração explícita
   const poolConfig: PoolConfig = {
-    connectionString: DATABASE_URL,
-  };
-
-  // Se estiver em produção (Vercel), força o SSL
-  if (NODE_ENV === "production") {
-    poolConfig.ssl = {
+    connectionString,
+    ssl: {
       rejectUnauthorized: false,
-    };
-    poolConfig.max = 10;
-    poolConfig.connectionTimeoutMillis = 10000;
-  }
+    },
+    max: 10,
+    connectionTimeoutMillis: 10000,
+  };
 
   _pool = globalForDb.pool ?? new Pool(poolConfig);
   _db = globalForDb.db ?? drizzle(_pool, { schema });
 
-  if (NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== "production") {
     globalForDb.pool = _pool;
     globalForDb.db = _db;
   }
